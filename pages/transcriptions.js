@@ -8,9 +8,10 @@ export default function Transcriptions() {
   useEffect(() => {
     if (transcriptions.length === 0 && images.length > 0) {
       const initialTranscriptions = images.map((image, index) => ({
-        title: `Imagem ${index + 1}`,
+        title: image.name,
         content: `Conteúdo transcrito da imagem ${index + 1}`,
       }));
+      console.dir(images);
       setTranscriptions(initialTranscriptions);
     }
   }, [images, transcriptions, setTranscriptions]);
@@ -36,11 +37,13 @@ export default function Transcriptions() {
           </li>
         ))}
       </ul>
-      <Link href="/chat">
-        <button className="bg-green-500 text-white py-2 px-4 rounded">
-          Iniciar Chat
-        </button>
-      </Link>
+      <div className="flex justify-center mt-4">
+        <Link href="/chat">
+          <button className="bg-gray-800 text-white py-2 px-20 rounded mt-4">
+            Iniciar Chat
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }

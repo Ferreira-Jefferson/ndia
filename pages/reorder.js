@@ -21,7 +21,10 @@ export default function Reorder() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Reordene as Imagens</h1>
-      <div className="mb-6">
+      <p className="mb-4 text-gray-500">
+        Você pode arrastar e soltar as imagens para reordená-las.
+      </p>
+      <div className="flex flex-wrap">
         {images.map((image, index) => (
           <div
             key={index}
@@ -29,21 +32,25 @@ export default function Reorder() {
             onDragStart={(event) => handleDrag(event, index)}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => handleDrop(event, index)}
-            className="border p-2 mb-2"
+            className="w-1/4 px-2 mb-10"
           >
             <img
               src={URL.createObjectURL(image)}
-              alt={`Image ${index + 1}`}
-              className="h-32 w-32 object-cover"
+              alt={image.name}
+              className="rounded-md"
+              style={{ aspectRatio: "4/5", flex: "1 1 auto" }}
             />
+            <div className="text-center mt-2">{image.name}</div>
           </div>
         ))}
       </div>
-      <Link href="/transcriptions">
-        <button className="bg-green-500 text-white py-2 px-4 rounded">
-          Próximo
-        </button>
-      </Link>
+      <div className="flex justify-center mt-4">
+        <Link href="/transcriptions">
+          <button className="bg-gray-800 text-white py-2 px-20 rounded mt-4">
+            Transcrever
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
