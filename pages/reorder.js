@@ -54,12 +54,12 @@ export default function Reorder() {
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Reordene as Imagens</h1>
-      <p className="mb-4 text-gray-500">
+    <div className="p-8 text-center">
+      <h1 className="text-2xl font-bold">Reordene as Imagens</h1>
+      <p className="text-gray-500 mb-5">
         Você pode arrastar e soltar as imagens para reordená-las.
       </p>
-      <div className="flex flex-wrap">
+      <div className="flex flex-wrap mx-auto w-3/4">
         {images.map((image, index) => (
           <div
             key={index}

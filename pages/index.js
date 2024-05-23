@@ -39,7 +39,7 @@ export default function Home() {
           type="file"
           multiple
           onChange={handleFileChange}
-          className="mb-4 mt-10"
+          className="mb-4 mt-10 text-white"
         />
       </div>
     </div>
