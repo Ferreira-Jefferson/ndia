@@ -30,7 +30,7 @@ export default function Transcriptions() {
           <li key={index} className="mb-4">
             <h2 className="text-lg font-semibold">{transcription.title}</h2>
             <textarea
-              value={transcription.content}
+              value={transcription.transcription}
               onChange={(e) => handleContentChange(index, e.target.value)}
               className="w-full border p-2"
             ></textarea>

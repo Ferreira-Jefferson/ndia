@@ -1,9 +1,14 @@
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import { useAppContext } from "../context/AppContext";
 
 export default function Reorder() {
-  const { images, setImages } = useAppContext();
+  const { images, setImages, setTranscriptions } = useAppContext();
+  const [transcribed, setTranscribed] = useState(false);
+  const router = useRouter();
+  if (transcribed) {
+    router.push("/transcriptions");
+  }
 
   const handleDrag = (event, index) => {
     event.dataTransfer.setData("text/plain", index);
@@ -16,6 +21,36 @@ export default function Reorder() {
     const [draggedImage] = reorderedImages.splice(draggedIndex, 1);
     reorderedImages.splice(index, 0, draggedImage);
     setImages(reorderedImages);
+  };
+
+  const handleTranscribe = async () => {
+    if (!images) {
+      console.error("Nenhum arquivo selecionado");
+      return;
+    }
+
+    const formData = new FormData();
+    images.forEach((image) => {
+      formData.append("file", image);
+    });
+
+    try {
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const { transcriptions } = await response.json();
+        console.log("Transcrição bem-sucedida:", transcriptions);
+        setTranscriptions(transcriptions);
+        setTranscribed(true);
+      } else {
+        console.error("Falha ao transcrever arquivo");
+      }
+    } catch (error) {
+      console.error("Erro ao transcrever arquivo:", error);
+    }
   };
 
   return (
@@ -45,11 +80,12 @@ export default function Reorder() {
         ))}
       </div>
       <div className="flex justify-center mt-4">
-        <Link href="/transcriptions">
-          <button className="bg-gray-800 text-white py-2 px-20 rounded mt-4">
-            Transcrever
-          </button>
-        </Link>
+        <button
+          className="bg-gray-800 text-white py-2 px-20 rounded mt-4"
+          onClick={handleTranscribe}
+        >
+          Transcrever
+        </button>
       </div>
     </div>
   );

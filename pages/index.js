@@ -3,19 +3,18 @@ import { useRouter } from "next/router";
 import { useAppContext } from "../context/AppContext";
 
 export default function Home() {
-  const router = useRouter();
   const { images, setImages } = useAppContext();
   const [uploaded, setUploaded] = useState(false);
+  const router = useRouter();
+  if (uploaded) {
+    router.push("/reorder");
+  }
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setImages([...images, ...files]);
     setUploaded(true);
   };
-
-  if (uploaded) {
-    router.push("/reorder");
-  }
 
   return (
     <div className="flex justify-center items-start h-screen pt-20">
