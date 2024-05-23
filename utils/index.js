@@ -4,7 +4,7 @@ const delay = async (time) => {
 
 const getTitleAndContent = (transcription) => {
   const splited = transcription.split("\n");
-  const title = splited[0];
+  const title = splited[0].replaceAll("*", "");
   splited.splice(0, 1);
   const content = splited.join("\n");
   return { title, content };

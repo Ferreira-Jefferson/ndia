@@ -3,19 +3,10 @@ import Link from "next/link";
 import { useAppContext } from "../context/AppContext";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { FaGripVertical } from "react-icons/fa";
+import createWord from "../core/createDocx";
 
 export default function Transcriptions() {
   const { images, transcriptions, setTranscriptions } = useAppContext();
-
-  useEffect(() => {
-    if (transcriptions.length === 0 && images.length > 0) {
-      const initialTranscriptions = images.map((image, index) => ({
-        title: image.name,
-        content: `Conteúdo transcrito da imagem ${index + 1}`,
-      }));
-      setTranscriptions(initialTranscriptions);
-    }
-  }, []);
 
   const handleContentChange = (index, content) => {
     const updatedTranscriptions = [...transcriptions];
@@ -31,6 +22,10 @@ export default function Transcriptions() {
     items.splice(result.destination.index, 0, reorderedItem);
 
     setTranscriptions(items);
+  };
+
+  const saveWord = () => {
+    createWord(transcriptions);
   };
 
   return (
@@ -70,7 +65,7 @@ export default function Transcriptions() {
                       <FaGripVertical className="mr-2 cursor-pointer" />
                       <div className="flex-1">
                         <h2 className="text-lg font-semibold">
-                          {transcription.title.replaceAll("*", "")}
+                          {transcription.title}
                         </h2>
                         <textarea
                           value={transcription.content}
@@ -90,7 +85,10 @@ export default function Transcriptions() {
         </Droppable>
       </DragDropContext>
       <div className="flex justify-center mt-4">
-        <button className="bg-gray-800 text-white py-2 px-20 rounded mt-4 mr-2">
+        <button
+          className="bg-gray-800 text-white py-2 px-20 rounded mt-4 mr-2"
+          onClick={saveWord}
+        >
           Salvar Word
         </button>
         <Link href="/chat">

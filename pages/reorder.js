@@ -67,7 +67,6 @@ export default function Reorder() {
 
       if (response.ok) {
         const { transcriptions } = await response.json();
-        console.log("Trans: ", transcriptions);
         console.log("Transcrição bem-sucedida:");
         setTranscriptions(transcriptions);
         setTranscribed(true);
