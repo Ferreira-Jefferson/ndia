@@ -1,6 +1,7 @@
 import { IncomingForm } from "formidable";
 import fs from "fs";
 import transcribeImage from "../../core/imageTranscriptAI";
+import { delay, getTitleAndContent } from "../../utils/index";
 
 export const config = {
   api: {
@@ -21,9 +22,14 @@ export default async function handler(req, res) {
     let transcriptions = [];
 
     for (let image of imageList) {
+      await delay(2);
       const transcription = await transcribeImage(image);
       const { originalFilename } = image;
-      transcriptions = [...transcriptions, { originalFilename, transcription }];
+      const titleAndContent = getTitleAndContent(transcription);
+      transcriptions = [
+        ...transcriptions,
+        { originalFilename, ...titleAndContent },
+      ];
     }
     try {
       res.status(200).json({ transcriptions });

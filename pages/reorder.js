@@ -1,14 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAppContext } from "../context/AppContext";
 
 export default function Reorder() {
   const { images, setImages, setTranscriptions } = useAppContext();
   const [transcribed, setTranscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const router = useRouter();
+
   if (transcribed) {
     router.push("/transcriptions");
   }
+
+  useEffect(() => {
+    let interval;
+
+    if (loading) {
+      interval = setInterval(() => {
+        setProgress((prevProgress) => {
+          if (prevProgress < 100) {
+            return prevProgress + 1; // Incrementa a porcentagem
+          } else {
+            clearInterval(interval);
+            return 100; // Garante que a porcentagem não passe de 100
+          }
+        });
+      }, 130 * images.length); // Ajuste o intervalo conforme necessário
+    }
+
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleDrag = (event, index) => {
     event.dataTransfer.setData("text/plain", index);
@@ -29,6 +51,9 @@ export default function Reorder() {
       return;
     }
 
+    setLoading(true);
+    setProgress(0);
+
     const formData = new FormData();
     images.forEach((image) => {
       formData.append("file", image);
@@ -42,7 +67,8 @@ export default function Reorder() {
 
       if (response.ok) {
         const { transcriptions } = await response.json();
-        console.log("Transcrição bem-sucedida:", transcriptions);
+        console.log("Trans: ", transcriptions);
+        console.log("Transcrição bem-sucedida:");
         setTranscriptions(transcriptions);
         setTranscribed(true);
       } else {
@@ -50,6 +76,9 @@ export default function Reorder() {
       }
     } catch (error) {
       console.error("Erro ao transcrever arquivo:", error);
+    } finally {
+      setProgress(100);
+      setLoading(false);
     }
   };
 
@@ -81,11 +110,20 @@ export default function Reorder() {
       </div>
       <div className="flex justify-center mt-4">
         <button
+          disabled={loading}
           className="bg-gray-800 text-white py-2 px-20 rounded mt-4"
           onClick={handleTranscribe}
         >
           Transcrever
         </button>
+      </div>
+      <div className="relative">
+        {loading && (
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex flex-col items-center justify-center z-50">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white mb-4"></div>
+            <div className="text-white text-xl">{progress}%</div>
+          </div>
+        )}
       </div>
     </div>
   );
