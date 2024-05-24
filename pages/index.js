@@ -30,6 +30,10 @@ export default function Home() {
             manuscritas em texto e cria um arquivo Word.
           </li>
           <li className="mb-3">
+            <strong>Salve a Transcrição:</strong> Permite salvar todas as
+            transcrições em um arquivo Word.
+          </li>
+          <li className="mb-3">
             <strong>Chat com AI:</strong> converse com a AI utilizando as
             informações das anotações transcritas.
           </li>
