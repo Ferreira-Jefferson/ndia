@@ -1,15 +1,9 @@
 // components/Navbar.js
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useAppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const { images, transcriptions, textEmb } = useAppContext();
-
-  const router = useRouter();
-  if (!images.length && !transcriptions.length && !textEmb.trim()) {
-    router.push("/");
-  }
 
   return (
     <nav className="bg-gray-800 p-4">
