@@ -1,10 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
+import createEmbedding from "../core/embeddingAI";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [embedding, setEmbedding] = useState("");
   const { transcriptions } = useAppContext();
+
+  const handleEmbedding = async () => {
+    if (!transcriptions) {
+      console.error("Não há documentos para fazer o embedding");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/embedding", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transcriptions),
+      });
+
+      if (response.ok) {
+        const { embedding } = await response.json();
+        console.log("Criação de embeddings bem-sucedida:", embedding);
+      } else {
+        console.error("Falha ao criar embeddings arquivo");
+      }
+    } catch (error) {
+      console.error("Erro ao criar embeddings arquivo:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleEmbedding();
+  }, []);
 
   const sendMessage = () => {
     if (input.trim()) {
