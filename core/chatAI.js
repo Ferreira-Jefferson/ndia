@@ -25,7 +25,13 @@ export default async function Chat(prompt, textEmb) {
         TEXTO: ${textEmb}
         `;
 
-  const result = await chat.sendMessage(promptPersonalizado);
-  const response = result.response;
-  return response.text();
+  const result = await chat.sendMessageStream(promptPersonalizado);
+
+  let textResponse = "";
+  for await (const chunk of result.stream) {
+    const chunkText = chunk.text();
+    textResponse += chunkText;
+  }
+
+  return textResponse;
 }

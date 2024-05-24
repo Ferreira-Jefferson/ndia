@@ -36,9 +36,15 @@ async function transcribeImage(image) {
 
   const imagePart = fileToGenerativePart(filepath, mimetype);
 
-  const result = await model.generateContent([prompt, imagePart]);
-  const response = result.response;
-  return response.text();
+  const result = await model.generateContentStream([prompt, imagePart]);
+
+  let textResponse = "";
+  for await (const chunk of result.stream) {
+    const chunkText = chunk.text();
+    textResponse += chunkText;
+  }
+
+  return textResponse;
 }
 
 export default transcribeImage;
