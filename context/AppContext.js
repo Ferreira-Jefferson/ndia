@@ -5,11 +5,19 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [images, setImages] = useState([]);
+  const [textEmb, setTextEmb] = useState("");
   const [transcriptions, setTranscriptions] = useState([]);
 
   return (
     <AppContext.Provider
-      value={{ images, setImages, transcriptions, setTranscriptions }}
+      value={{
+        images,
+        setImages,
+        transcriptions,
+        setTranscriptions,
+        textEmb,
+        setTextEmb,
+      }}
     >
       {children}
     </AppContext.Provider>

@@ -1,60 +1,62 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import createEmbedding from "../core/embeddingAI";
+import { marked } from "marked";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [embedding, setEmbedding] = useState("");
-  const { transcriptions } = useAppContext();
+  const [prompt, setPrompt] = useState("");
+  const [rowsTextarea, setRowsTextarea] = useState(1);
+  const { textEmb } = useAppContext();
 
-  const handleEmbedding = async () => {
-    if (!transcriptions) {
-      console.error("Não há documentos para fazer o embedding");
+  const sendChatMessage = async () => {
+    if (!prompt.trim()) {
+      setPrompt("");
       return;
     }
-
     try {
-      const response = await fetch("/api/embedding", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(transcriptions),
+        body: JSON.stringify({ prompt, textEmb }),
       });
 
       if (response.ok) {
-        const { embedding } = await response.json();
-        console.log("Criação de embeddings bem-sucedida:", embedding);
+        const { result } = await response.json();
+        sendMessage(result);
+        console.log("Transcrição bem-sucedida:");
       } else {
-        console.error("Falha ao criar embeddings arquivo");
+        console.error("Falha ao transcrever arquivo");
       }
     } catch (error) {
-      console.error("Erro ao criar embeddings arquivo:", error);
+      console.error("Erro ao transcrever arquivo:", error);
     }
   };
-
-  useEffect(() => {
-    handleEmbedding();
-  }, []);
-
-  const sendMessage = () => {
-    if (input.trim()) {
-      setMessages([...messages, { sender: "user", text: input }]);
-      setInput("");
-      // Simulate AI response
-      setTimeout(() => {
-        setMessages((msgs) => [
-          ...msgs,
-          { sender: "ai", text: "Resposta da AI" },
-        ]);
-      }, 1000);
-    }
+  const sendMessage = (result) => {
+    setMessages([...messages, { sender: "user", text: prompt }]);
+    setPrompt("");
+    setMessages((msgs) => [...msgs, { sender: "ai", text: result }]);
   };
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    const rows = value.split("\n").length;
+    if (rowsTextarea !== rows && rows <= 5) setRowsTextarea(rows);
+    setPrompt(value);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      if (event.shiftKey) return;
+
+      event.preventDefault();
+      sendChatMessage();
+    }
+  };
   return (
-    <div className="p-8 bg-gray-900 text-white min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Pesquise no Documento</h1>
+    <div className="p-8 bg-gray-900 text-white min-h-screen text-center">
+      <h1 className="text-2xl font-bold mb-4">Converse com os Documento</h1>
       <div className="bg-gray-800 p-4 rounded mb-4 h-96 overflow-y-auto">
         {messages.map((message, index) => (
           <div
@@ -63,32 +65,22 @@ export default function Chat() {
           >
             <span
               className={`inline-block p-2 rounded ${message.sender === "user" ? "bg-blue-500" : "bg-green-500"}`}
-            >
-              {message.text}
-            </span>
+              dangerouslySetInnerHTML={{ __html: marked(message.text) }}
+            />
           </div>
         ))}
       </div>
       <div className="flex">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-grow p-2 rounded-l bg-gray-700 border-none text-white"
+        <textarea
+          value={prompt}
+          rows={rowsTextarea}
+          onKeyDown={handleKeyPress}
+          onChange={handleChange}
+          className="flex-grow p-2 rounded-l bg-gray-700 border-none text-white resize-none"
         />
-        <button onClick={sendMessage} className="bg-blue-500 p-2 rounded-r">
+        <button onClick={sendChatMessage} className="bg-tomato p-2 rounded-r">
           Enviar
         </button>
-      </div>
-      <div className="mt-4 flex space-x-4">
-        <button className="bg-blue-500 text-white py-2 px-4 rounded">
-          Salvar Documento
-        </button>
-        {transcriptions.length > 0 && (
-          <button className="bg-green-500 text-white py-2 px-4 rounded">
-            Salvar Chat
-          </button>
-        )}
       </div>
     </div>
   );

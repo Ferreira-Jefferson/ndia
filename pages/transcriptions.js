@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAppContext } from "../context/AppContext";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -6,12 +5,21 @@ import { FaGripVertical } from "react-icons/fa";
 import createWord from "../core/createDocx";
 
 export default function Transcriptions() {
-  const { images, transcriptions, setTranscriptions } = useAppContext();
+  const { images, transcriptions, setTranscriptions, setTextEmb } =
+    useAppContext();
 
   const handleContentChange = (index, content) => {
     const updatedTranscriptions = [...transcriptions];
     updatedTranscriptions[index].content = content;
     setTranscriptions(updatedTranscriptions);
+  };
+
+  const createTextEmb = () => {
+    const result = transcriptions.reduce(
+      (acc, item) => `${acc}\n${item.title}\n${item.content}`,
+      "",
+    );
+    setTextEmb(result);
   };
 
   const handleOnDragEnd = (result) => {
@@ -92,7 +100,10 @@ export default function Transcriptions() {
           Salvar Word
         </button>
         <Link href="/chat">
-          <button className="bg-gray-800 text-white py-2 px-20 rounded mt-4 ml-2">
+          <button
+            className="bg-gray-800 text-white py-2 px-20 rounded mt-4 ml-2"
+            onClick={createTextEmb}
+          >
             Iniciar Chat
           </button>
         </Link>

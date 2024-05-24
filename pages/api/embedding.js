@@ -1,20 +1,16 @@
 import createEmbedding from "../../core/embeddingAI";
 
-const createText = (transcriptions) =>
-  transcriptions.reduce((acc, item) => `${acc}\n${item.content}`, "");
-
 export default async function handler(req, res) {
   try {
-    const transcriptions = req.body;
-    console.log(transcriptions);
+    const textEmb = req.body;
 
-    if (!Array.isArray(transcriptions)) {
+    if (!textEmb) {
       throw new Error(
-        "O corpo da requisição deve ser um array de transcriptions",
+        "O corpo da requisição deve possuir o texto concatenado da transcrição",
       );
     }
 
-    const embedding = await createEmbedding(createText(transcriptions));
+    const embedding = await createEmbedding(textEmb);
     res.status(200).json({ embedding });
   } catch (error) {
     console.error("Error creating embedding", error);
